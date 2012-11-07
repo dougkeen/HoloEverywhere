@@ -10,6 +10,7 @@ import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListAdapter;
@@ -18,6 +19,7 @@ import com.WazaBe.HoloEverywhere.R;
 import com.WazaBe.HoloEverywhere.internal.AlertController;
 import com.WazaBe.HoloEverywhere.internal.AlertController.AlertParams.OnPrepareListViewListener;
 import com.WazaBe.HoloEverywhere.widget.ListView;
+import com.WazaBe.HoloEverywhere.widget.Spinner;
 
 public class AlertDialog extends Dialog implements DialogInterface {
 	public static class Builder {
@@ -44,6 +46,7 @@ public class AlertDialog extends Dialog implements DialogInterface {
 			if (P.mOnKeyListener != null) {
 				dialog.setOnKeyListener(P.mOnKeyListener);
 			}
+			dialog.setRootView(P.mView);
 			return dialog;
 		}
 
@@ -344,6 +347,30 @@ public class AlertDialog extends Dialog implements DialogInterface {
 
 	public ListView getListView() {
 		return mAlert.getListView();
+	}
+
+	private View mRootView;
+
+	protected void setRootView(View view) {
+		mRootView = view;
+	}
+
+	@Override
+	public void dismiss() {
+		/*
+		 * This horribly awkward piece of code prevents force closes when you
+		 * rotate the screen while a Spinner's popup is open
+		 */
+		if (mRootView != null && mRootView instanceof ViewGroup) {
+			ViewGroup viewGroup = (ViewGroup) mRootView;
+			for (int i = viewGroup.getChildCount() - 1; i >= 0; i--) {
+				View currentView = viewGroup.getChildAt(i);
+				if (currentView instanceof Spinner) {
+					viewGroup.removeViewAt(i);
+				}
+			}
+		}
+		super.dismiss();
 	}
 
 	@Override
