@@ -366,7 +366,7 @@ public class AlertDialog extends Dialog implements DialogInterface {
 			for (int i = viewGroup.getChildCount() - 1; i >= 0; i--) {
 				View currentView = viewGroup.getChildAt(i);
 				if (currentView instanceof Spinner) {
-					viewGroup.removeViewAt(i);
+					((Spinner) currentView).dismissPopup();
 				}
 			}
 		}
